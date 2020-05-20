@@ -35,7 +35,7 @@ class ListViewController: UIViewController {
         
         func downloadJSON(completed: @escaping () -> ()) {
             files.removeAll()
-            guard let url = URL(string: "http://192.168.86.136/") else { return }
+            guard let url = URL(string: "http://24.4.79.131:8218") else { return }
             URLSession.shared.dataTask(with: url) { (data, response, error) in
                 guard let data = data else { return }
                 
