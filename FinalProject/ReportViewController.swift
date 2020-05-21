@@ -39,17 +39,11 @@ class ReportViewController: UIViewController, ChartViewDelegate {
         }
         
         lineChart.delegate = self
-        let margins = view.safeAreaLayoutGuide
-        print(margins.layoutFrame.size.width)
-        
-        lineChart.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
-        view.addSubview(lineChart)
-        
-//        lineChart.leadingAnchor.constraint(equalTo: margins.leadingAnchor).isActive = true
-//        lineChart.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-//        lineChart.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
-//        lineChart.widthAnchor.constraint(equalTo: margins.widthAnchor).isActive = true
-//        myView.heightAnchor.constraint(equalTo: myView.widthAnchor, multiplier: 2.0).isActive = true
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        drawLineChart()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -61,9 +55,27 @@ class ReportViewController: UIViewController, ChartViewDelegate {
         super.viewDidLayoutSubviews()
         
         updateLineChart()
+        drawLineChart()
     }
     
-    func updateLineChart() {var entries = [ChartDataEntry]()
+    func drawLineChart() {
+        let safeArea = view.safeAreaLayoutGuide
+        print("W=\(safeArea.layoutFrame.size.width),H=\(safeArea.layoutFrame.size.height)")
+        
+        lineChart.frame = CGRect(x: 0, y: 0, width: safeArea.layoutFrame.size.width, height: safeArea.layoutFrame.size.height)
+        view.addSubview(lineChart)
+        
+        lineChart.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor).isActive = true
+        lineChart.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor).isActive = true
+        lineChart.topAnchor.constraint(equalTo: safeArea.topAnchor).isActive = true
+        lineChart.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor).isActive = true
+//        lineChart.widthAnchor.constraint(equalTo: safeArea.widthAnchor).isActive = true
+//        lineChart.heightAnchor.constraint(equalTo: safeArea.widthAnchor).isActive = true
+        
+    }
+    
+    func updateLineChart() {
+        var entries = [ChartDataEntry]()
         var labels = [String]()
         
         for x in 0..<reports.count {
