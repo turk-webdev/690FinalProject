@@ -27,6 +27,7 @@ class ReportViewController: UIViewController, ChartViewDelegate {
         
         downloadJSON {
             self.lineChart.notifyDataSetChanged()
+            self.updateLineChart()
         }
         
         self.title = file?.filename ?? "Report"
@@ -38,27 +39,47 @@ class ReportViewController: UIViewController, ChartViewDelegate {
         }
         
         lineChart.delegate = self
+        let margins = view.safeAreaLayoutGuide
+        print(margins.layoutFrame.size.width)
+        
+        lineChart.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
+        view.addSubview(lineChart)
+        
+//        lineChart.leadingAnchor.constraint(equalTo: margins.leadingAnchor).isActive = true
+//        lineChart.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
+//        lineChart.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
+//        lineChart.widthAnchor.constraint(equalTo: margins.widthAnchor).isActive = true
+//        myView.heightAnchor.constraint(equalTo: myView.widthAnchor, multiplier: 2.0).isActive = true
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        lineChart.delegate = nil
+        reports.removeAll()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        lineChart.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
-        lineChart.center = view.center
-        view.addSubview(lineChart)
-        
-        var entries = [ChartDataEntry]()
+        updateLineChart()
+    }
+    
+    func updateLineChart() {var entries = [ChartDataEntry]()
+        var labels = [String]()
         
         for x in 0..<reports.count {
             let val = Double(reports[x].entry) ?? 0.0
             entries.append(ChartDataEntry(x: Double(x), y: Double(val)))
+            labels.append("\(x):00")
         }
         
         let set = LineChartDataSet(entries: entries)
         set.colors = ChartColorTemplates.material()
-        
         let data = LineChartData(dataSet: set)
         lineChart.data = data
+        
+        lineChart.xAxis.enabled = true
+        lineChart.xAxis.valueFormatter = IndexAxisValueFormatter(values: labels)
+        lineChart.xAxis.granularity = 1
     }
 
     func downloadJSON(completed: @escaping () -> ()) {
